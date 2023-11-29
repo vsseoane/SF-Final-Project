@@ -1,6 +1,6 @@
-public with sharing class LegalAccountMigrationService {
+public with sharing class ucl_LegalAdvisors {
 
-    public LegalAccountMigrationService() { }
+    public ucl_LegalAdvisors() { }
 
     public HttpResponse getAllLegalAccounts() {
         HttpResponse response = makeGetRequest();
@@ -100,7 +100,7 @@ public with sharing class LegalAccountMigrationService {
             }
          }
         if(!clientsToAdd.isEmpty()) {
-            upsert clientsToAdd;
+            upsert clientsToAdd externalId__c;
         }
     }
 
