@@ -2,7 +2,7 @@ public with sharing class ucl_LegalAdvisors {
 
     public ucl_LegalAdvisors() { }
 
-    public HttpResponse getAllLegalAccounts() {
+    public HttpResponse migrateAllLegalAccounts() {
         HttpResponse response = makeGetRequest();
         try {
 
