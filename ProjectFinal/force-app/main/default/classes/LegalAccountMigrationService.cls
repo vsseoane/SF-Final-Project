@@ -35,7 +35,7 @@ public with sharing class LegalAccountMigrationService {
             }
 
             if(legalAccounts.size() > 0) {
-                upsert legalAccounts;
+                upsert legalAccounts Account_Number__c;
             }
             Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
             saveClients(accountsNumbersWithClients, accountsReference);
@@ -99,7 +99,6 @@ public with sharing class LegalAccountMigrationService {
                  clientsToAdd.add(c);
             }
          }
-        System.debug('Counts to clients to add: ' + clientsToAdd.size());
         if(!clientsToAdd.isEmpty()) {
             upsert clientsToAdd;
         }
