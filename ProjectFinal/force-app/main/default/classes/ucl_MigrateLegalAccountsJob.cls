@@ -1,8 +1,8 @@
-public with sharing class MigrateLegalAccountsJob implements Schedulable {
-    public MigrateLegalAccountsJob() {
+public with sharing class ucl_MigrateLegalAccountsJob implements Schedulable {
+    public ucl_MigrateLegalAccountsJob() {
 
     }
-
+    
     public void execute(SchedulableContext ctx) {
         try {
             ucl_LegalAdvisors l = new ucl_LegalAdvisors();
@@ -27,7 +27,7 @@ public with sharing class MigrateLegalAccountsJob implements Schedulable {
             ? 'Migration Legal Account Successful'
             : 'The MigrateLegalAccounts Job has encountered an error. Error Message: ' + errorMessage;
 
-        mail.setPlainTextBody(body);\
+        mail.setPlainTextBody(body);
         Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
     }
 }
