@@ -2,19 +2,21 @@ public with sharing class ucl_LegalAdvisors {
 
     public ucl_LegalAdvisors() { }
 
-    public HttpResponse migrateAllLegalAccounts() {
+    @AuraEnabled
+    public static Boolean migrateAllLegalAccounts() {
         HttpResponse response = makeGetRequest();
+        Boolean successful = false;
         try {
 
             if(response.getStatusCode() != 200) {
                 System.debug('Error: ' + response.getStatusCode() + ' ' + response.getStatus());
-                return response;
+                return successful;
             }
             
             List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(response.getBody());
             if(legalAccountsObj.isEmpty()) {
                 System.debug('legalAccounts is empty');
-                return response;
+                return successful;
             }
 
             List<Legal_Accounts__c> legalAccounts = new List<Legal_Accounts__c>();
@@ -39,13 +41,14 @@ public with sharing class ucl_LegalAdvisors {
             }
             Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
             saveClients(accountsNumbersWithClients, accountsReference);
+            successful = true;
         } catch(Exception e ) {
             System.debug('Error ' + e);
         }
-        return response;
+        return successful;
     }
 
-    private HttpResponse makeGetRequest() {
+    private static HttpResponse makeGetRequest() {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         String uriResource = 'LegalAccounts';
@@ -55,7 +58,7 @@ public with sharing class ucl_LegalAdvisors {
         return response;
     }
 
-    private Date parseDate(String dateString) {
+    private static Date parseDate(String dateString) {
         List<String> dateComponents = dateString.split('/');
         Integer month = Integer.valueOf(dateComponents[0]);
         Integer day = Integer.valueOf(dateComponents[1]);
@@ -64,7 +67,7 @@ public with sharing class ucl_LegalAdvisors {
         return dt;
     }
 
-    private Legal_Accounts__c adaptAccountObj(Map<String, Object> accountObj) {
+    private static Legal_Accounts__c adaptAccountObj(Map<String, Object> accountObj) {
         Legal_Accounts__c legalAccount = new Legal_Accounts__c();
         legalAccount.Account_Number__c = (String) accountObj.get('AccountNumber');
         legalAccount.Name = (String) accountObj.get('AccountName');
@@ -74,7 +77,7 @@ public with sharing class ucl_LegalAdvisors {
         return legalAccount;
     }
 
-    private List<Client__c> getClientsFromAccount(List<Object> clientsObj) {
+    private static List<Client__c> getClientsFromAccount(List<Object> clientsObj) {
         List<Client__c> clients = new List<Client__c>();
         for (Object clientObj : clientsObj) {
             Map<String, Object> clientMap = (Map<String, Object>) clientObj;
@@ -90,7 +93,7 @@ public with sharing class ucl_LegalAdvisors {
         return clients;
     }
 
-    private void saveClients(Map<String, List<Client__c>> accountsWithClients, Map<String, Id> accountsReference) { 
+    private static void saveClients(Map<String, List<Client__c>> accountsWithClients, Map<String, Id> accountsReference) { 
         List<Client__c> clientsToAdd = new List<Client__c>();
         for (String accountNumber : accountsWithClients.keySet()) {
             List<Client__c> clients = accountsWithClients.get(accountNumber);
@@ -104,7 +107,7 @@ public with sharing class ucl_LegalAdvisors {
         }
     }
 
-    private Map<String, Id> buildAccountsReference(List<Legal_Accounts__c> accounts) {
+    private static Map<String, Id> buildAccountsReference(List<Legal_Accounts__c> accounts) {
         Map<String, Id> accountsReference = new Map<String, Id>();
         for (Legal_Accounts__c a : accounts) {
             accountsReference.put(a.Account_Number__c, a.Id);

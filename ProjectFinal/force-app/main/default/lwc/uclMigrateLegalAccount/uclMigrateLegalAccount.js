@@ -1,14 +1,30 @@
 import { LightningElement } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import migrateAllLegalAccounts from '@salesforce/apex/ucl_LegalAdvisors.migrateAllLegalAccounts';
+import sendEmailNotification from '@salesforce/apex/ucl_Utils.sendEmailNotification'; 
 
 export default class UclMigrateLegalAccount extends LightningElement {
     handleClick(event) {
-        const toastEvent = new ShowToastEvent({
-            title: "Account created",
-            message: "Record ID: ",
-            variant: "success"
-        });
-        this.dispatchEvent(toastEvent);
+        migrateAllLegalAccounts()
+            .then(response => {
+                sendEmailNotification(true, null, 'vsseoane@gmail.com');
+                const toastEvent = new ShowToastEvent({
+                    title: "Migration Successful",
+                    message: "The legal accounts were imported",
+                    variant: "success"
+                });
+              
+                this.dispatchEvent(toastEvent);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                sendEmailNotification(false, error.message, 'vsseoane@gmail.com');
+                const toastEvent = new ShowToastEvent({
+                    title: "Migration Fail",
+                    message: "Error: " + error.message,
+                    variant: "error"
+                });
+                this.dispatchEvent(toastEvent);
+            });
     }
-
 }
