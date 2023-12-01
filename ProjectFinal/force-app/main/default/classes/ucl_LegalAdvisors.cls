@@ -26,6 +26,9 @@ public with sharing class ucl_LegalAdvisors {
             for(Object accountObj: legalAccountsObj) {
                 Map<String, Object> account = (Map<String, Object>) accountObj;
                 Legal_Accounts__c legalAccount = adaptAccountObj(account);
+                if(!shouldInsert(legalAccount)) {
+                    continue;
+                }
                 legalAccounts.add(legalAccount);
                 List<Object> clientsObj = (List<Object>) account.get('Clients');
                 Boolean itHasClients = clientsObj.size() > 0;
@@ -91,6 +94,7 @@ public with sharing class ucl_LegalAdvisors {
             client.Name = (String) clientMap.get('FirstName');
             client.Last_Name__c = (String) clientMap.get('LastName');
             client.Phone__c = (String) clientMap.get('Phone');
+            client.isMigrated__c = True;
             clients.add(client);
         }
         return clients;
@@ -98,10 +102,14 @@ public with sharing class ucl_LegalAdvisors {
 
     private static void saveClients(Map<String, List<Client__c>> accountsWithClients, Map<String, Id> accountsReference) { 
         List<Client__c> clientsToAdd = new List<Client__c>();
+       
         for (String accountNumber : accountsWithClients.keySet()) {
+            Id accountId = accountsReference.get(accountNumber);
             List<Client__c> clients = accountsWithClients.get(accountNumber);
+            removeDeprecatedClients(accountId, clients);
              for (Client__c c : clients) {
-                 c.Legal_Advisor__c = accountsReference.get(accountNumber);
+                 
+                 c.Legal_Advisor__c = accountId;
                  clientsToAdd.add(c);
             }
          }
@@ -116,5 +124,35 @@ public with sharing class ucl_LegalAdvisors {
             accountsReference.put(a.Account_Number__c, a.Id);
         }
         return accountsReference;
+    }
+
+    private static Boolean shouldInsert(Legal_Accounts__c legalAccount) {
+        Boolean shouldInsert = true;
+        if(legalAccount.Account_Status__c == 'DISABLED') {
+            Legal_Accounts__c tempAccount = [SELECT Id FROM Legal_Accounts__c WHERE Account_Status__c = 'ENABLED']; 
+            if(tempAccount != null) {
+                shouldInsert = false;
+            }
+        }
+        return shouldInsert;
+    }
+    
+    private static void removeDeprecatedClients(Id accountId, List<Client__c> clientsToAdd) {
+        List<Client__c> previousClients = [SELECT Id FROM Client__c WHERE Legal_Advisor__c = :accountId and 
+                                            isMigrated__c = True];
+        if(previousClients == null) {
+            return;
+        }
+        List<Client__c> clientsToRemove = new List<Client__c>();
+        for(Client__c previousClient : previousClients) {
+            if( !clientsToAdd.contains(previousClient) ) {
+                clientsToRemove.add(previousClient);
+            }
+        }
+        if(clientsToRemove.size() > 0) {
+            System.debug('Clients removed: ' + clientsToRemove);
+            delete clientsToRemove;
+        }
+        
     }
 }
