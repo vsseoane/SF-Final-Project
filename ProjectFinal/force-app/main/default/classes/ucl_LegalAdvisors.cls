@@ -10,7 +10,7 @@ public with sharing class ucl_LegalAdvisors {
 
             if(response.getStatusCode() != 200) {
                 System.debug('Error: ' + response.getStatusCode() + ' ' + response.getStatus());
-                return successful;
+                throw new HandleCustomException('Error' + response.getStatusCode() + ' ' + response.getStatus());
             }
             
             List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(response.getBody());
@@ -18,7 +18,7 @@ public with sharing class ucl_LegalAdvisors {
                 System.debug('legalAccounts is empty');
                 return successful;
             }
-
+            
             List<Legal_Accounts__c> legalAccounts = new List<Legal_Accounts__c>();
             List<Client__c> clients = new List<Client__c>();
             Map<String, List<Client__c>> accountsNumbersWithClients = new Map<String, List<Client__c>>();
@@ -35,18 +35,21 @@ public with sharing class ucl_LegalAdvisors {
                 } 
                 
             }
-
             if(legalAccounts.size() > 0) {
                 upsert legalAccounts Account_Number__c;
             }
+            
             Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
             saveClients(accountsNumbersWithClients, accountsReference);
             successful = true;
         } catch(Exception e ) {
-            System.debug('Error ' + e);
+            successful = false;
+            HandleCustomException.LogException(e);
+            System.debug('Error ' + e?.getMessage());
+            throw e;
         }
         return successful;
-    }
+    } 
 
     private static HttpResponse makeGetRequest() {
         Http http = new Http();

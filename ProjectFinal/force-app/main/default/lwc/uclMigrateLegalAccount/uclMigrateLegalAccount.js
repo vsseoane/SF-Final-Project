@@ -21,7 +21,7 @@ export default class UclMigrateLegalAccount extends LightningElement {
                 sendEmailNotification(false, error.message, 'vsseoane@gmail.com');
                 const toastEvent = new ShowToastEvent({
                     title: "Migration Fail",
-                    message: "Error: " + error.message,
+                    message: " The migration couldn't be created.",
                     variant: "error"
                 });
                 this.dispatchEvent(toastEvent);
