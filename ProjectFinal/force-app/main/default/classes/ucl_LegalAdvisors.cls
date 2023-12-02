@@ -26,6 +26,7 @@ public with sharing class ucl_LegalAdvisors {
             for(Object accountObj: legalAccountsObj) {
                 Map<String, Object> account = (Map<String, Object>) accountObj;
                 Legal_Accounts__c legalAccount = adaptAccountObj(account);
+                
                 if(!shouldInsert(legalAccount)) {
                     continue;
                 }
@@ -48,8 +49,9 @@ public with sharing class ucl_LegalAdvisors {
         } catch(Exception e ) {
             successful = false;
             HandleCustomException.LogException(e);
-            System.debug('Error ' + e?.getMessage());
-            throw e;
+            System.debug('Error:' + e);
+        } finally {
+
         }
         return successful;
     } 
@@ -128,9 +130,12 @@ public with sharing class ucl_LegalAdvisors {
 
     private static Boolean shouldInsert(Legal_Accounts__c legalAccount) {
         Boolean shouldInsert = true;
-        if(legalAccount.Account_Status__c == 'DISABLED') {
-            Legal_Accounts__c tempAccount = [SELECT Id FROM Legal_Accounts__c WHERE Account_Status__c = 'ENABLED']; 
-            if(tempAccount != null) {
+        if(legalAccount.Account_Status__c == 'Disabled') {
+            List<Legal_Accounts__c> tempAccount = [SELECT Id FROM Legal_Accounts__c WHERE Account_Status__c = 'Enabled'
+                                                 AND Account_Number__c = :legalAccount.Account_Number__c]; //isMigrated__c = True AND 
+            System.debug('tempAccount: ' + tempAccount);
+            if(tempAccount.size() == 0) {
+                System.debug('tempAccount distintino nullo: ' + tempAccount);
                 shouldInsert = false;
             }
         }

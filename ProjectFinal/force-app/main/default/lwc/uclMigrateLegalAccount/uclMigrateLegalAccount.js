@@ -7,13 +7,15 @@ export default class UclMigrateLegalAccount extends LightningElement {
     handleClick(event) {
         migrateAllLegalAccounts()
             .then(response => {
+
+                if(response == false) throw Exception("there was an error");
                 sendEmailNotification(true, null, 'vsseoane@gmail.com');
                 const toastEvent = new ShowToastEvent({
                     title: "Migration Successful",
                     message: "The legal accounts were imported",
                     variant: "success"
                 });
-              
+               
                 this.dispatchEvent(toastEvent);
             })
             .catch(error => {
