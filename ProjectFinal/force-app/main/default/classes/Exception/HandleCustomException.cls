@@ -21,7 +21,19 @@ public with sharing class HandleCustomException extends Exception {
       exc.ClassName__c = className;
       exc.Date__c = DateTime.now();
       insert exc;
-    } finally {
+    } catch (Exception ex) {
+      System.debug(ex);
+    }
+  }
+
+  public static void LogException(String errorMessage) {
+    try {
+      CustomException__c exc = new CustomException__c();
+      exc.Exception_Message__c = errorMessage;
+      exc.Date__c = DateTime.now();
+      insert exc;
+    } catch (Exception e) {
+      System.debug(e);
     }
   }
 }
