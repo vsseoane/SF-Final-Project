@@ -4,13 +4,14 @@ public with sharing class ucl_LegalAdvisorsService {
 
   @AuraEnabled
   public static Boolean migrateAllLegalAccounts() {
-    HttpResponse response = makeRequest(
-      'https://altimetrik-bootcamp.herokuapp.com/',
-      'LegalAccounts',
-      'GET'
-    );
+    HttpResponse response = new HttpResponse();
     Boolean successful = false;
     try {
+      response = ucl_Utils.makeRequest(
+        'https://altimetrik-bootcamp.herokuapp.com/',
+        'LegalAccounts',
+        'GET'
+      );
       List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(
         response.getBody()
       );
