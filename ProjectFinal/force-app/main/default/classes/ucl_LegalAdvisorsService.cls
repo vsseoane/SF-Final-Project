@@ -8,51 +8,48 @@ public with sharing class ucl_LegalAdvisorsService {
     Boolean successful = false;
 
     try {
-      System.debug('MIGRATEEDD!!!');
-      throw new NullPointerException();
+      response = ucl_Utils.makeRequest(
+        'https://altimetrik-bootcamp.herokuapp.com/',
+        'LegalAccounts',
+        'GET'
+      );
+      List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(
+        response.getBody()
+      );
 
-      // response = ucl_Utils.makeRequest(
-      //   'https://altimetrik-bootcamp.herokuapp.com/',
-      //   'LegalAccounts',
-      //   'GET'
-      // );
-      // List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(
-      //   response.getBody()
-      // );
+      if (legalAccountsObj.isEmpty()) {
+        System.debug('legalAccounts is empty');
+        return successful;
+      }
 
-      // if (legalAccountsObj.isEmpty()) {
-      //   System.debug('legalAccounts is empty');
-      //   return successful;
-      // }
+      List<Legal_Accounts__c> legalAccounts = new List<Legal_Accounts__c>();
 
-      // List<Legal_Accounts__c> legalAccounts = new List<Legal_Accounts__c>();
+      Map<String, List<Client__c>> accountsNumbersWithClients = new Map<String, List<Client__c>>();
 
-      // Map<String, List<Client__c>> accountsNumbersWithClients = new Map<String, List<Client__c>>();
+      for (Object obj : legalAccountsObj) {
+        Map<String, Object> accountJson = (Map<String, Object>) obj;
+        Legal_Accounts__c legalAccount = adaptAccountObj(accountJson);
 
-      // for (Object obj : legalAccountsObj) {
-      //   Map<String, Object> accountJson = (Map<String, Object>) obj;
-      //   Legal_Accounts__c legalAccount = adaptAccountObj(accountJson);
+        if (!shouldInsert(legalAccount))
+          continue;
 
-      //   if (!shouldInsert(legalAccount))
-      //     continue;
+        legalAccounts.add(legalAccount);
+        List<Object> clientsObj = (List<Object>) accountJson.get('Clients');
+        if (!clientsObj.isEmpty()) {
+          List<Client__c> clients = parseClientsFromAccount(clientsObj);
+          accountsNumbersWithClients.put(
+            legalAccount.Account_Number__c,
+            clients
+          );
+        }
+      }
 
-      //   legalAccounts.add(legalAccount);
-      //   List<Object> clientsObj = (List<Object>) accountJson.get('Clients');
-      //   if (!clientsObj.isEmpty()) {
-      //     List<Client__c> clients = parseClientsFromAccount(clientsObj);
-      //     accountsNumbersWithClients.put(
-      //       legalAccount.Account_Number__c,
-      //       clients
-      //     );
-      //   }
-      // }
-
-      // if (!legalAccounts.isEmpty()) {
-      //   upsert legalAccounts Account_Number__c;
-      // }
-      // Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
-      // saveClients(accountsNumbersWithClients, accountsReference);
-      // successful = true;
+      if (!legalAccounts.isEmpty()) {
+        upsert legalAccounts Account_Number__c;
+      }
+      Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
+      saveClients(accountsNumbersWithClients, accountsReference);
+      successful = true;
     } catch (Exception e) {
       successful = false;
       HandleCustomException.LogException(e);
