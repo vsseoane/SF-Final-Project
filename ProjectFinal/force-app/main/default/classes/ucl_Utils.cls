@@ -1,28 +1,39 @@
 public with sharing class ucl_Utils {
   @AuraEnabled
+  @future(callout=true)
   public static void sendEmailNotification(
     Boolean isSuccess,
-    String errorMessage,
-    String email
+    String errorMessage
   ) {
-    Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+    try {
+      Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
 
-    String[] toAddresses = new List<String>{ email };
-    mail.setToAddresses(toAddresses);
+      String email = getSystemAdministratorEmail();
+      if (email == '') {
+        email = 'vsseoane@gmail.com';
+      }
 
-    mail.setSubject(
-      isSuccess
-        ? 'The Legal Account Migration Job was Successful'
-        : 'The Legal Account Migration Job was Failed'
-    );
+      String[] toAddresses = new List<String>{ email };
+      mail.setToAddresses(toAddresses);
 
-    String body = isSuccess
-      ? 'Migration Legal Account Successful'
-      : 'The MigrateLegalAccounts Job has encountered an error. Error Message: ' +
-        errorMessage;
+      mail.setSubject(
+        isSuccess
+          ? 'The Legal Account Migration Job was Successful'
+          : 'The Legal Account Migration Job was Failed'
+      );
 
-    mail.setPlainTextBody(body);
-    Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
+      String body = isSuccess
+        ? 'Migration Legal Account Successful'
+        : 'The MigrateLegalAccounts Job has encountered an error. Error Message: ' +
+          errorMessage;
+
+      mail.setPlainTextBody(body);
+      Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
+      System.debug('Email sent to ' + email);
+    } catch (Exception e) {
+      HandleCustomException.LogException(e);
+      System.debug('Error:' + e);
+    }
   }
 
   public static HttpResponse makeRequest(
@@ -45,5 +56,23 @@ public with sharing class ucl_Utils {
       );
     }
     return response;
+  }
+
+  private static String getSystemAdministratorEmail() {
+    String emailToReturn = '';
+    Profile sys_adm_profile = [
+      SELECT Id
+      FROM Profile
+      WHERE Name = 'System Administrator'
+    ];
+    List<User> sys_adm = [
+      SELECT id, Email
+      FROM User
+      WHERE ProfileId = :sys_adm_profile.Id
+    ];
+
+    emailToReturn = sys_adm[0]?.Email;
+    System.debug('emailToreturn ' + emailToReturn);
+    return emailToReturn;
   }
 }
