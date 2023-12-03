@@ -1,6 +1,7 @@
 trigger ClientUniqueIdValidation on Client__c(before insert) {
-  Set<String> externalIds = new Set<String>();
-  Set<String> accountIds = new Set<String>();
+  List<String> externalIds = new List<String>();
+  List<String> accountIds = new List<String>();
+
   for (Client__c client : Trigger.new) {
     externalIds.add(client.ExternalId__c);
     accountIds.add(client.Legal_Advisor__c);

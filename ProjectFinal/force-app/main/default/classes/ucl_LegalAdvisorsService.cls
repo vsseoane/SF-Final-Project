@@ -1,7 +1,4 @@
 public with sharing class ucl_LegalAdvisorsService {
-  public ucl_LegalAdvisorsService() {
-  }
-
   @AuraEnabled
   public static Boolean migrateAllLegalAccounts() {
     HttpResponse response = new HttpResponse();
