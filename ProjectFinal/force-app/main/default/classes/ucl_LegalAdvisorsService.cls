@@ -6,50 +6,53 @@ public with sharing class ucl_LegalAdvisorsService {
   public static Boolean migrateAllLegalAccounts() {
     HttpResponse response = new HttpResponse();
     Boolean successful = false;
+
     try {
-      response = ucl_Utils.makeRequest(
-        'https://altimetrik-bootcamp.herokuapp.com/',
-        'LegalAccounts',
-        'GET'
-      );
-      List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(
-        response.getBody()
-      );
+      System.debug('MIGRATEEDD!!!');
+      throw new NullPointerException();
 
-      if (legalAccountsObj.isEmpty()) {
-        System.debug('legalAccounts is empty');
-        return successful;
-      }
+      // response = ucl_Utils.makeRequest(
+      //   'https://altimetrik-bootcamp.herokuapp.com/',
+      //   'LegalAccounts',
+      //   'GET'
+      // );
+      // List<Object> legalAccountsObj = (List<Object>) JSON.deserializeUntyped(
+      //   response.getBody()
+      // );
 
-      List<Legal_Accounts__c> legalAccounts = new List<Legal_Accounts__c>();
+      // if (legalAccountsObj.isEmpty()) {
+      //   System.debug('legalAccounts is empty');
+      //   return successful;
+      // }
 
-      Map<String, List<Client__c>> accountsNumbersWithClients = new Map<String, List<Client__c>>();
+      // List<Legal_Accounts__c> legalAccounts = new List<Legal_Accounts__c>();
 
-      for (Object obj : legalAccountsObj) {
-        Map<String, Object> accountJson = (Map<String, Object>) obj;
-        Legal_Accounts__c legalAccount = adaptAccountObj(accountJson);
+      // Map<String, List<Client__c>> accountsNumbersWithClients = new Map<String, List<Client__c>>();
 
-        if (!shouldInsert(legalAccount))
-          continue;
+      // for (Object obj : legalAccountsObj) {
+      //   Map<String, Object> accountJson = (Map<String, Object>) obj;
+      //   Legal_Accounts__c legalAccount = adaptAccountObj(accountJson);
 
-        legalAccounts.add(legalAccount);
-        List<Object> clientsObj = (List<Object>) accountJson.get('Clients');
-        if (!clientsObj.isEmpty()) {
-          List<Client__c> clients = parseClientsFromAccount(clientsObj);
-          accountsNumbersWithClients.put(
-            legalAccount.Account_Number__c,
-            clients
-          );
-        }
-      }
+      //   if (!shouldInsert(legalAccount))
+      //     continue;
 
-      if (!legalAccounts.isEmpty()) {
-        upsert legalAccounts Account_Number__c;
-      }
+      //   legalAccounts.add(legalAccount);
+      //   List<Object> clientsObj = (List<Object>) accountJson.get('Clients');
+      //   if (!clientsObj.isEmpty()) {
+      //     List<Client__c> clients = parseClientsFromAccount(clientsObj);
+      //     accountsNumbersWithClients.put(
+      //       legalAccount.Account_Number__c,
+      //       clients
+      //     );
+      //   }
+      // }
 
-      Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
-      saveClients(accountsNumbersWithClients, accountsReference);
-      successful = true;
+      // if (!legalAccounts.isEmpty()) {
+      //   upsert legalAccounts Account_Number__c;
+      // }
+      // Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
+      // saveClients(accountsNumbersWithClients, accountsReference);
+      // successful = true;
     } catch (Exception e) {
       successful = false;
       HandleCustomException.LogException(e);
@@ -140,9 +143,7 @@ public with sharing class ucl_LegalAdvisorsService {
           Account_Status__c = 'Enabled'
           AND Account_Number__c = :legalAccount.Account_Number__c
       ]; //isMigrated__c = True AND
-      System.debug('tempAccount: ' + tempAccount);
       if (tempAccount.isEmpty()) {
-        System.debug('tempAccount distintino nullo: ' + tempAccount);
         shouldInsert = false;
       }
     }
@@ -168,7 +169,6 @@ public with sharing class ucl_LegalAdvisorsService {
       }
     }
     if (!clientsToRemove.isEmpty()) {
-      System.debug('Clients removed: ' + clientsToRemove);
       delete clientsToRemove;
     }
   }
