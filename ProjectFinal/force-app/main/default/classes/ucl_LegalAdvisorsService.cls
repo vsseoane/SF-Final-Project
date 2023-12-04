@@ -46,6 +46,11 @@ public with sharing class ucl_LegalAdvisorsService {
       }
       Map<String, Id> accountsReference = buildAccountsReference(legalAccounts);
       saveClients(accountsNumbersWithClients, accountsReference);
+      //////////////
+      List<Client__c> clientsTOCHECK = [SELECT externalId__c FROM Client__c];
+      System.debug('clientsTOCHECK: ' + clientsTOCHECK);
+
+      ////////////
       successful = true;
     } catch (Exception e) {
       successful = false;
@@ -156,12 +161,14 @@ public with sharing class ucl_LegalAdvisorsService {
     if (previousClients == null) {
       return;
     }
+
     List<Client__c> clientsToRemove = new List<Client__c>();
     for (Client__c previousClient : previousClients) {
       if (!clientsToAdd.contains(previousClient)) {
         clientsToRemove.add(previousClient);
       }
     }
+
     if (!clientsToRemove.isEmpty()) {
       delete clientsToRemove;
     }

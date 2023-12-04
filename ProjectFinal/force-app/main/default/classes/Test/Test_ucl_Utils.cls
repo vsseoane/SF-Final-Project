@@ -77,4 +77,26 @@ private class Test_ucl_Utils {
     }
     Test.stopTest();
   }
+
+  @isTest
+  static void testSendEmailNotification_Success() {
+    Test.startTest();
+
+    ucl_Utils.sendEmail(true, null);
+    Integer invocations = Limits.getEmailInvocations();
+
+    Test.stopTest();
+    System.assertEquals(1, invocations, 'Email has not been sent');
+  }
+
+  @isTest
+  static void testSendEmailNotification_IsNotSuccess() {
+    Test.startTest();
+
+    ucl_Utils.sendEmail(false, null);
+    Integer invocations = Limits.getEmailInvocations();
+
+    Test.stopTest();
+    System.assertEquals(1, invocations, 'Email has not been sent');
+  }
 }

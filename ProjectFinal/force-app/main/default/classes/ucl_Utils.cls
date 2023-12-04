@@ -5,6 +5,10 @@ public with sharing class ucl_Utils {
     Boolean isSuccess,
     String errorMessage
   ) {
+    sendEmail(isSuccess, errorMessage);
+  }
+
+  public static void sendEmail(Boolean isSuccess, String errorMessage) {
     try {
       Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
 
