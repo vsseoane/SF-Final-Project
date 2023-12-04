@@ -8,7 +8,7 @@ public with sharing class ucl_Utils {
     try {
       Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
 
-      String email = getSystemAdministratorEmail();
+      String email = getSystemAdministratorEmail()[0];
       if (email == '') {
         email = 'vsseoane@gmail.com';
       }
@@ -58,8 +58,8 @@ public with sharing class ucl_Utils {
     return response;
   }
 
-  private static String getSystemAdministratorEmail() {
-    String emailToReturn = '';
+  public static List<String> getSystemAdministratorEmail() {
+    List<String> emailsToReturn = new List<String>();
     Profile sys_adm_profile = [
       SELECT Id
       FROM Profile
@@ -71,8 +71,10 @@ public with sharing class ucl_Utils {
       WHERE ProfileId = :sys_adm_profile.Id
     ];
 
-    emailToReturn = sys_adm[0]?.Email;
-    System.debug('emailToreturn ' + emailToReturn);
-    return emailToReturn;
+    for (User user : sys_adm) {
+      emailsToReturn.add(user.Email);
+    }
+    System.debug('emailsToReturn ' + emailsToReturn);
+    return emailsToReturn;
   }
 }

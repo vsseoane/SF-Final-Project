@@ -10,7 +10,7 @@ private class TestLogsController {
     );
     insert customE;
     Test.startTest();
-    List<CustomException__c> logs = LogsController.getLogs();
+    List<CustomException__c> logs = ucl_LogsController.getLogs();
     Test.stopTest();
     System.assertNotEquals(0, logs.size(), 'The method should return logs');
   }

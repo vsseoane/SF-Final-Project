@@ -4,7 +4,7 @@ private class TestHandleCustomEx {
   static void testLogEx() {
     Test.startTest();
     NullPointerException e = new NullPointerException();
-    HandleCustomException.LogException(e);
+    ucl_HandleCustomException.LogException(e);
     Test.stopTest();
     List<CustomException__c> logs = [SELECT Id FROM CustomException__c];
     System.assertNotEquals(
