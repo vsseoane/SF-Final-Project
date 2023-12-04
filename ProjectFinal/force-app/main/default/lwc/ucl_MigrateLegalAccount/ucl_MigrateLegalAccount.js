@@ -4,7 +4,7 @@ import { LightningElement } from 'lwc';
 import migrateAllLegalAccounts from '@salesforce/apex/ucl_LegalAdvisorsService.migrateAllLegalAccounts';
 import sendEmailNotification from '@salesforce/apex/ucl_Utils.sendEmailNotification'; 
 
-export default class UclMigrateLegalAccount extends LightningElement {
+export default class ucl_MigrateLegalAccount extends LightningElement {
     handleClick() {
         migrateAllLegalAccounts()
             .then(response => {

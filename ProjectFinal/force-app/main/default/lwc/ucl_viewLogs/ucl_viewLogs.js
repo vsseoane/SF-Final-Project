@@ -13,7 +13,7 @@ const COLUMNS = [
     { label: 'Date', fieldName: DATE.fieldApiName, type: 'datetime' }
     
 ];
-export default class ViewLogs extends LightningElement {
+export default class ucl_viewLogs extends LightningElement {
     columns = COLUMNS;
     @wire(getLogs)
     logs;
