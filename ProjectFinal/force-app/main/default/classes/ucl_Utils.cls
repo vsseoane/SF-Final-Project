@@ -31,7 +31,7 @@ public with sharing class ucl_Utils {
       Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ mail });
       System.debug('Email sent to ' + email);
     } catch (Exception e) {
-      HandleCustomException.LogException(e);
+      ucl_HandleCustomException.LogException(e);
       System.debug('Error:' + e);
     }
   }
@@ -51,7 +51,7 @@ public with sharing class ucl_Utils {
       System.debug(
         'Error: ' + response.getStatusCode() + ' ' + response.getStatus()
       );
-      throw new HandleCustomException(
+      throw new ucl_HandleCustomException(
         'Error' + response.getStatusCode() + ' ' + response.getStatus()
       );
     }

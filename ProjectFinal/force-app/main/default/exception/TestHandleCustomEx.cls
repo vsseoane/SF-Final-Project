@@ -18,7 +18,7 @@ private class TestHandleCustomEx {
   static void testLogExString() {
     Test.startTest();
     NullPointerException e = new NullPointerException();
-    HandleCustomException.LogException('This is an error');
+    ucl_HandleCustomException.LogException('This is an error');
 
     List<CustomException__c> logs = [
       SELECT Id

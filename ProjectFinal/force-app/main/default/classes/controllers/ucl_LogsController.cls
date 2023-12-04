@@ -1,4 +1,4 @@
-public with sharing class LogsController {
+public with sharing class ucl_LogsController {
   @AuraEnabled(cacheable=true)
   public static List<CustomException__c> getLogs() {
     return [

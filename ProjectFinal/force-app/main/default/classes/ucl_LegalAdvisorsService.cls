@@ -49,7 +49,7 @@ public with sharing class ucl_LegalAdvisorsService {
       successful = true;
     } catch (Exception e) {
       successful = false;
-      HandleCustomException.LogException(e);
+      ucl_HandleCustomException.LogException(e);
       System.debug('Error:' + e);
     }
 

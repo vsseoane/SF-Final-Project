@@ -1,4 +1,4 @@
-public with sharing class HandleCustomException extends Exception {
+public with sharing class ucl_HandleCustomException extends Exception {
   public static void LogException(Exception e) {
     String stackTrace = e.getStackTraceString().substringBefore('\n');
     String className = stackTrace.substringAfter('.').substringBefore('.');
