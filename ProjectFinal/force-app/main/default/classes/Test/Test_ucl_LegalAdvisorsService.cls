@@ -33,7 +33,6 @@ private class Test_ucl_LegalAdvisorsService {
       FROM Client__c
       WHERE Legal_Advisor__c = :account.id
     ];
-    System.debug('ADDED ' + clients);
     System.assertEquals(
       clients.size(),
       2,
